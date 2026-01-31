@@ -5,6 +5,12 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        {/* ✅ REQUIRED FOR MOBILE RESPONSIVENESS */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1"
+        />
+
         {/* Font Awesome CDN */}
         <link
           rel="stylesheet"

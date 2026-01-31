@@ -1,132 +1,190 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export default function Testimonials() {
-    const reviews = [
-        { name: "John Doe", feedback: "Excellent quality products and great service!", image: "/images/user1.jpg" },
-        { name: "Sarah Lee", feedback: "Loved the acrylic sheets, highly recommend!", image: "/images/user2.jpg" },
-        { name: "Michael Smith", feedback: "Great team and very professional.", image: "/images/user3.jpg" },
-        { name: "Emily Johnson", feedback: "The products exceeded my expectations.", image: "/images/user4.jpg" },
-        { name: "David Wilson", feedback: "Fast delivery and great packaging.", image: "/images/user5.jpg" },
-        { name: "Sophia Brown", feedback: "Amazing quality and long-lasting.", image: "/images/user6.jpg" },
-        { name: "Chris Evans", feedback: "Affordable and premium quality.", image: "/images/user7.jpg" },
-        { name: "Olivia Martinez", feedback: "Customer service was fantastic!", image: "/images/user8.jpg" },
-    ];
+  const [reviews, setReviews] = useState([]);
+  const [current, setCurrent] = useState(0);
 
-    const [currentSet, setCurrentSet] = useState(0);
-    const [animate, setAnimate] = useState(false);
-    const sectionRef = useRef(null);
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [rating, setRating] = useState(5);
 
-    // Loop testimonials every 3s
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentSet((prev) => (prev === 0 ? 1 : 0));
-        }, 4000);
-        return () => clearInterval(interval);
-    }, []);
+  /* FETCH REVIEWS */
+  useEffect(() => {
+    fetch("/api/feedback")
+      .then((res) => res.json())
+      .then((data) => setReviews(data || []));
+  }, []);
 
-    // Trigger animation on scroll into view
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setAnimate(entry.isIntersecting);
-            },
-            { threshold: 0.3 }
-        );
+  /* AUTO SLIDE */
+  useEffect(() => {
+    if (!reviews.length) return;
 
-        if (sectionRef.current) observer.observe(sectionRef.current);
-        return () => observer.disconnect();
-    }, []);
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % reviews.length);
+    }, 4500);
 
-    const visibleReviews = reviews.slice(currentSet * 4, currentSet * 4 + 4);
+    return () => clearInterval(timer);
+  }, [reviews]);
 
-    return (
-        <section ref={sectionRef} className="py-16 bg-gray-50 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-[1.1fr_1fr] gap-8 items-start">
+  /* SUBMIT */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-                {/* Left - Testimonials */}
-                <div key={currentSet} className={`${animate ? "animate-slide-left" : ""} pl-6`}>
-                    <h2 className="text-3xl font-bold mb-8">Testimonials</h2>
-                    <div className="space-y-8">
-                        {visibleReviews.map((review, index) => (
-                            <div key={index} className="flex items-start">
-                                <img
-                                    src={review.image}
-                                    alt={review.name}
-                                    className="w-16 h-16 rounded-full object-cover"
-                                />
-                                <div className="ml-6">
-                                    <p className="text-lg font-bold text-gray-800 italic mb-2">
-                                        "{review.feedback}"
-                                    </p>
-                                    <h3 className="text-base font-semibold">{review.name}</h3>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Right - Leave Your Opinion */}
-                <div
-                    className={`bg-white rounded-lg shadow-md p-6 w-full max-w-lg ${animate ? "animate-slide-right" : ""
-                        }`}
-                >
-                    <h3 className="text-2xl font-bold mb-4">Leave Your Opinion</h3>
-                    <p className="text-gray-600 mb-4">
-                        Share your experience with our acrylic sheets and louver products.
-                    </p>
-                    <form className="space-y-4">
-                        <input
-                            type="text"
-                            placeholder="Your Name"
-                            className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <textarea
-                            placeholder="Your Feedback"
-                            rows="4"
-                            className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        ></textarea>
-                        <button
-                            type="submit"
-                            className="w-full bg-gray-900 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition"
-                        >
-                            Submit
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            {/* Animations */}
-            <style jsx>{`
-  @keyframes slideLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-50px);
+    if (!name || !feedback) {
+      alert("Please fill required fields");
+      return;
     }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes slideRight {
-    from {
-      opacity: 0;
-      transform: translateX(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  .animate-slide-left {
-    animation: slideLeft 2.5s ease-out;
-  }
-  .animate-slide-right {
-    animation: slideRight 2.5s ease-out;
-  }
-`}</style>
 
-        </section>
+    const res = await fetch("/api/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, city, feedback, rating }),
+    });
+
+    const data = await res.json();
+    setReviews((prev) => [data, ...prev]);
+
+    const msg = `⭐ New Client Review
+
+Name: ${name}
+City / Profession: ${city}
+Rating: ${rating} Star(s)
+Feedback: ${feedback}`;
+
+    window.open(
+      `https://wa.me/919999999999?text=${encodeURIComponent(msg)}`,
+      "_blank"
     );
+
+    setName("");
+    setCity("");
+    setFeedback("");
+    setRating(5);
+  };
+
+  const review = reviews[current];
+
+  return (
+    <section className="bg-gradient-to-b from-gray-100 to-white py-20">
+      <div className="max-w-6xl xl:max-w-7xl mx-auto px-4">
+
+        {/* HEADER */}
+        <div className="mb-14 pl-8">
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900">
+            Client Reviews
+          </h2>
+
+          <p className="mt-3 text-base font-bold text-gray-600">
+            ⭐ Rated <span className="text-gray-900">4.8/5</span> by 100+ customers
+          </p>
+        </div>
+
+        {/* CONTENT */}
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-14 items-start">
+
+          {/* REVIEW CARD */}
+          {review && (
+            <div className="bg-white p-8 lg:p-10 rounded-2xl shadow-xl border border-gray-100">
+              <div className="flex mb-4">
+                {Array.from({ length: review.rating || 5 }).map((_, i) => (
+                  <span key={i} className="text-yellow-400 text-xl lg:text-2xl">
+                    ★
+                  </span>
+                ))}
+              </div>
+
+              <p className="text-lg lg:text-xl italic text-gray-700 leading-relaxed mb-6">
+                “{review.feedback}”
+              </p>
+
+              <div className="font-semibold text-gray-900 text-lg lg:text-xl">
+                {review.name}
+              </div>
+              <div className="text-sm text-gray-500">
+                {review.city}
+              </div>
+
+              <div className="flex gap-2 mt-6">
+                {reviews.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      i === current ? "bg-green-700" : "bg-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* FORM */}
+          <div className="bg-white p-8 lg:p-10 rounded-2xl shadow-xl border border-gray-100">
+            <h3 className="text-2xl lg:text-3xl font-extrabold text-gray-900">
+              Share Your Experience
+            </h3>
+
+            <p className="text-gray-600 mt-2 mb-6 text-sm">
+              Your feedback helps us improve our products and serve you better.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+
+              <input
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 outline-none"
+                placeholder="Your Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+
+              <input
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 outline-none"
+                placeholder="City / Profession (optional)"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+
+              <textarea
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-green-600 outline-none"
+                rows="4"
+                placeholder="Your Feedback"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-2">
+                  Rate Your Experience
+                </p>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`text-3xl ${
+                        star <= rating ? "text-yellow-400" : "text-gray-300"
+                      } hover:scale-110 transition`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button className="w-full bg-green-700 hover:bg-green-800 text-white py-3 rounded-lg font-semibold transition shadow-md">
+                Send Feedback on WhatsApp
+              </button>
+            </form>
+
+            <p className="text-xs text-gray-500 mt-4">
+              ⭐ We may feature your review on our website
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

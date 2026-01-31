@@ -1,148 +1,102 @@
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
 
 const products = [
-  { name: 'Plain Acrylic', href: '/products/PlainAcrylic', image: '/images/plain.png' },
-  { name: 'Cane Acrylic', href: '/products/caneacrylic', image: '/images/plain.png' },
-  { name: 'Solid Colour Louvers', href: '/products/solidcolourlouvers', image: '/images/plain.png' },
-  { name: 'Solid Colour Acrylic', href: '/products/solidcolouracrylic', image: '/images/plain.png' },
-  { name: 'Marble Louvers', href: '/products/marblelouvers', image: '/images/plain.png' },
-  { name: 'Corien Sheet', href: '/products/CorienSheet', image: '/images/plain.png' },
+  {
+    title: "Plain Acrylic Sheets",
+    subtitle: "Clear · Durable · Multiple Thickness",
+    href: "/products?category=acrylic",
+    image: "/images/plain.png",
+  },
+  {
+    title: "Cane Acrylic Sheets",
+    subtitle: "Decorative · Premium · Stylish Finish",
+    href: "/products?category=acrylic",
+    image: "/images/cane.png",
+  },
+  {
+    title: "Solid Colour Acrylic",
+    subtitle: "Glossy · Matte · Custom Shades",
+    href: "/products?category=solid",
+    image: "/images/solid.png",
+  },
+  {
+    title: "Designer Louvers",
+    subtitle: "Modern · Interior & Exterior Use",
+    href: "/products?category=louvers",
+    image: "/images/marble.png",
+  },
+  {
+    title: "Corian Sheet",
+    subtitle: "Premium · Seamless · Long-Lasting",
+    href: "/products?category=solid",
+    image: "/images/corien.png",
+  },
 ];
 
-const ProductSection: React.FC = () => {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    // After 0.5s delay, set visible true to trigger fade-in + animation
-    const timer = setTimeout(() => {
-      setVisible(true);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
+export default function ProductSection() {
   return (
-    <section id="products" className="product-section">
-      <h2 className="section-title">Popular Categories</h2>
-      <div className="product-grid">
+    <section className="bg-[#f4f4f4] py-16 px-4">
+      {/* SECTION HEADING */}
+      <h2 className="text-center text-3xl font-extrabold text-gray-800 mb-12">
+        Explore Our Product Range
+      </h2>
+
+      {/* PRODUCT LIST */}
+      <div
+        className="
+          mx-auto
+          max-w-lg
+          md:max-w-4xl
+          lg:max-w-6xl
+          grid
+          grid-cols-1
+          lg:grid-cols-2
+          gap-6
+        "
+      >
         {products.map((product, index) => (
           <Link
             key={index}
             href={product.href}
-            className={`product-item ${visible ? 'visible' : 'hidden'}`}
-            aria-label={`View gallery for ${product.name}`}
+            className="
+              flex items-center gap-5
+              bg-white rounded-2xl
+              px-5 py-5
+              shadow-sm hover:shadow-md
+              transition-all
+            "
           >
-            <div className="image-wrapper floating">
+            {/* IMAGE */}
+            <div className="w-[90px] h-[90px] rounded-full overflow-hidden flex-shrink-0 border border-gray-200">
               <Image
                 src={product.image}
-                alt={product.name}
-                width={250}
-                height={250}
-                style={{ objectFit: 'cover' }}
+                alt={product.title}
+                width={90}
+                height={90}
+                className="object-cover"
               />
             </div>
-            <p className="product-name">{product.name}</p>
+
+            {/* TEXT */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-[17px] font-extrabold text-gray-900 leading-snug">
+                {product.title}
+              </h3>
+
+              <p className="text-[14px] font-medium text-gray-600 mt-1">
+                {product.subtitle}
+              </p>
+
+              <span className="inline-block mt-3 bg-green-500 text-white text-[13px] font-semibold px-4 py-2 rounded-full">
+                View Designs →
+              </span>
+            </div>
           </Link>
         ))}
       </div>
-
-      <style jsx>{`
-        .product-section {
-          text-align: center;
-          padding: 50px 20px;
-        }
-
-        .section-title {
-          font-size: 2.5rem;
-          font-weight: 700;
-          margin-bottom: 40px;
-        }
-
-        .product-grid {
-          display: flex;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 15px;
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        @media (min-width: 1024px) {
-          .product-item {
-            flex: 0 0 calc((100% / 3) - 15px);
-            max-width: calc((100% / 3) - 15px);
-          }
-        }
-
-        @media (max-width: 1023px) and (min-width: 769px) {
-          .product-item {
-            flex: 0 0 calc((100% / 2) - 15px);
-            max-width: calc((100% / 2) - 15px);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .section-title {
-            font-size: 2rem;
-          }
-          .product-grid {
-            gap: 20px;
-          }
-          .product-item {
-            flex: 0 0 100%;
-            max-width: 100%;
-          }
-        }
-
-        .product-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          cursor: pointer;
-          transition: opacity 1s ease, transform 0.2s ease-in-out;
-          color: inherit;
-          text-decoration: none;
-          opacity: 0; /* initially hidden */
-        }
-        .product-item.visible {
-          opacity: 1; /* fade in */
-        }
-        .product-item:hover {
-          transform: translateY(-5px);
-        }
-
-        .image-wrapper {
-          width: 250px;
-          height: 250px;
-          border-radius: 50%;
-          overflow: hidden;
-          border: 2px solid #ddd;
-        }
-
-        .product-name {
-          margin-top: 15px;
-          font-size: 1.2rem;
-          font-weight: 500;
-        }
-
-        /* Floating up/down animation */
-        @keyframes floatUpDown {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-15px);
-          }
-        }
-
-        .floating {
-          animation: floatUpDown 3s ease-in-out infinite;
-        }
-      `}</style>
     </section>
   );
-};
-
-export default ProductSection;
+}

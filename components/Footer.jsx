@@ -64,11 +64,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center">
                                 <FontAwesomeIcon icon={faChevronRight} className="text-red-500 mr-2 w-4 h-4" />
-                                <a href="#products" className="hover:text-red-500">Our Products</a>
-                            </li>
-                            <li className="flex items-center">
-                                <FontAwesomeIcon icon={faChevronRight} className="text-red-500 mr-2 w-4 h-4" />
-                                <a href="/contact" className="hover:text-red-500">Contact Us</a>
+                                <a href="/products" className="hover:text-red-500">Our Products</a>
                             </li>
                         </ul>
                         <ul className="space-y-3">
@@ -78,7 +74,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center">
                                 <FontAwesomeIcon icon={faChevronRight} className="text-red-500 mr-2 w-4 h-4" />
-                                <a href="/application" className="hover:text-red-500">Catalog</a>
+                                <a href="/catalog" className="hover:text-red-500">Catalog</a>
                             </li>
                         </ul>
                     </div>
@@ -118,15 +114,20 @@ export default function Footer() {
             </div>
 
             {/* Bottom Bar */}
-            <div className="bg-[#2D3748] text-gray-300 text-sm flex flex-col md:flex-row justify-between items-center px-6 py-3 border-t border-gray-700">
-                <div className="space-x-4 mb-2 md:mb-0">
-                    <a href="/terms" className="hover:text-white font-bold">Terms & Conditions</a>
-                    <a href="/privacy" className="hover:text-white font-bold">Privacy Policy</a>
-                </div>
-                <p className="font-bold">
-                    Copyright © {new Date().getFullYear()} SHREE BALAJI DECORE | All Rights Reserved.
-                </p>
-            </div>
+               <div className="bg-[#2D3748] px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-gray-300">
+        <div className="space-x-6 mb-2 md:mb-0 font-bold">
+          <a href="/terms" className="hover:text-white transition">
+            Terms & Conditions
+          </a>
+          <a href="/privacy" className="hover:text-white transition">
+            Privacy Policy
+          </a>
+        </div>
+
+        <p className="font-bold text-center">
+          © {new Date().getFullYear()} SHREE BALAJI DECORE | All Rights Reserved
+        </p>
+      </div>
         </footer>
     );
 }
